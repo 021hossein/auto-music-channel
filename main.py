@@ -5,7 +5,7 @@ import time
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from telegram_helper import send_music, send_audio, send_post
+from telegram_helper import send_music, send_post
 
 # Set up your Spotify API credentials
 client_id = '5f2fb8894e464653bd0c2fbd81e957a6'
