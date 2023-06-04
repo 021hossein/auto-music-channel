@@ -2,16 +2,15 @@
 FROM python:3.9-slim
 
 # Install dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     ffmpeg \
     openssl \
     aria2 \
     g++ \
     git \
-    py3-cffi \
     libffi-dev \
-    zlib-dev
+    zlib1g-dev
 
 # Set working directory
 WORKDIR /app
