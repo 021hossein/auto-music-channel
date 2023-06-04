@@ -1,6 +1,18 @@
 # Base image with Python
 FROM python:3.9-slim
 
+# Install dependencies
+RUN apk add --no-cache \
+    ca-certificates \
+    ffmpeg \
+    openssl \
+    aria2 \
+    g++ \
+    git \
+    py3-cffi \
+    libffi-dev \
+    zlib-dev
+
 # Set working directory
 WORKDIR /app
 
