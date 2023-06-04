@@ -17,7 +17,6 @@ WORKDIR /app
 
 # Copy the Python script and requirements.txt
 COPY main.py telegram_helper.py /app/
-COPY music.mp3 /app/
 COPY requirements.txt /app/
 
 
