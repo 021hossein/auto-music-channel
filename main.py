@@ -30,7 +30,7 @@ async def check_recently_added_tracks(playlist_uri):
     # Retrieve the current state of the playlist
     results = spotify.playlist_items(playlist_uri)
 
-    logger().info(f"getting playlist items...")
+    logger().info(f"checking playlist for new items...")
 
     # Get the current time in UTC
     current_time = datetime.datetime.utcnow()
@@ -52,7 +52,7 @@ async def check_recently_added_tracks(playlist_uri):
         if time_difference.total_seconds() <= interval:
             print(f"Recently added track: {track_name}")
             logger().info(f"Recently added track: {track_name}")
-            await asyncio.run(task(url, path))
+            await task(url, path)
 
     time.sleep(interval)
     await check_recently_added_tracks(playlist_uri)
