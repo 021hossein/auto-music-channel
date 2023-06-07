@@ -25,12 +25,12 @@ playlist_uri = 'https://open.spotify.com/playlist/0nixvGXVVYy23KDUD09e4y?si=88d8
 
 
 async def check_recently_added_tracks(playlist_uri):
-    logger.info("getting playlist items...")
+    logger().info("getting playlist items...")
 
     # Retrieve the current state of the playlist
     results = spotify.playlist_items(playlist_uri)
 
-    logger.info(f"getting playlist items...")
+    logger().info(f"getting playlist items...")
 
     # Get the current time in UTC
     current_time = datetime.datetime.utcnow()
@@ -51,7 +51,7 @@ async def check_recently_added_tracks(playlist_uri):
         # Check if the track was added within the last 10 seconds
         if time_difference.total_seconds() <= interval:
             print(f"Recently added track: {track_name}")
-            logger.info(f"Recently added track: {track_name}")
+            logger().info(f"Recently added track: {track_name}")
             await asyncio.run(task(url, path))
 
     time.sleep(interval)
@@ -66,12 +66,12 @@ async def download(url, path):
 
 
 async def task(url, path):
-    logger.info(f"downloading {path} ...")
+    logger().info(f"downloading {path} ...")
     await download(url, path)
-    logger.info(f"sending {path} ...")
+    logger().info(f"sending {path} ...")
     await send_music(bot_token, chat_id, path)
     # remove file after sending
-    logger.info(f"removing {path} ...")
+    logger().info(f"removing {path} ...")
     os.remove(path)
     return path
 
