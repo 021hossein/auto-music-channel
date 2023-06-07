@@ -54,7 +54,7 @@ def check_recently_added_tracks(playlist_uri):
     check_recently_added_tracks(playlist_uri)
 
 
-async def download_and_send(url, path):
+def download_and_send(url, path):
     command = f"python -m spotdl {url}"
     print(f"download is starting: {path}")
     process = await asyncio.create_subprocess_shell(command)
