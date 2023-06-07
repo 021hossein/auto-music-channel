@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import logging
 import os
 import time
 import subprocess
@@ -25,7 +26,7 @@ spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 playlist_uri = 'https://open.spotify.com/playlist/0nixvGXVVYy23KDUD09e4y?si=88d8a7433512415a'
 
 
-def check_recently_added_tracks(playlist_uri):
+async def check_recently_added_tracks(playlist_uri):
     # Retrieve the current state of the playlist
     results = spotify.playlist_items(playlist_uri)
 
@@ -48,21 +49,22 @@ def check_recently_added_tracks(playlist_uri):
         # Check if the track was added within the last 10 seconds
         if time_difference.total_seconds() <= interval:
             print(f"Recently added track: {track_name}")
-            download_and_send(url, path)
+            logging.info(f"Recently added track: {track_name}")
+            await asyncio.run(download_and_send(url, path))
 
     time.sleep(interval)
-    check_recently_added_tracks(playlist_uri)
+    await check_recently_added_tracks(playlist_uri)
 
 
-def download_and_send(url, path):
+async def download_and_send(url, path):
     command = f"python -m spotdl {url}"
-    print(f"download is starting: {path}")
+    logging.info(f"download is starting: {path}")
     process = await asyncio.create_subprocess_shell(command)
     await process.communicate()
-    print(f"sending: {path}")
+    logging.info(f"sending: {path}")
     asyncio.run(send_music(bot_token, chat_id, path))
     # remove file after sending
-    print(f"removing: {path}")
+    logging.info(f"removing: {path}")
     os.remove(path)
     return path
 
@@ -70,6 +72,6 @@ def download_and_send(url, path):
 if __name__ == '__main__':
     # print_hi('PyCharm')
 
-    check_recently_added_tracks(playlist_uri)
+    asyncio.run(check_recently_added_tracks(playlist_uri))
     # asyncio.run(send_music(bot_token, chat_id, './music.mp3'))
     # send_audio(bot_token, chat_id, './music.mp3')
