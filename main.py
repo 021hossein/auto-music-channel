@@ -3,8 +3,6 @@ import datetime
 import logging
 import os
 import time
-import subprocess
-
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -27,8 +25,12 @@ playlist_uri = 'https://open.spotify.com/playlist/0nixvGXVVYy23KDUD09e4y?si=88d8
 
 
 async def check_recently_added_tracks(playlist_uri):
+    logger.info("getting playlist items...")
+
     # Retrieve the current state of the playlist
     results = spotify.playlist_items(playlist_uri)
+
+    logger.info(f"getting playlist items...")
 
     # Get the current time in UTC
     current_time = datetime.datetime.utcnow()
@@ -49,29 +51,49 @@ async def check_recently_added_tracks(playlist_uri):
         # Check if the track was added within the last 10 seconds
         if time_difference.total_seconds() <= interval:
             print(f"Recently added track: {track_name}")
-            logging.info(f"Recently added track: {track_name}")
-            await asyncio.run(download_and_send(url, path))
+            logger.info(f"Recently added track: {track_name}")
+            await asyncio.run(task(url, path))
 
     time.sleep(interval)
     await check_recently_added_tracks(playlist_uri)
 
 
-async def download_and_send(url, path):
-    command = f"python -m spotdl {url}"
-    logging.info(f"download is starting: {path}")
+async def download(url, path):
+    command = f"spotdl {url}"
     process = await asyncio.create_subprocess_shell(command)
     await process.communicate()
-    logging.info(f"sending: {path}")
-    asyncio.run(send_music(bot_token, chat_id, path))
+    return path
+
+
+async def task(url, path):
+    logger.info(f"downloading {path} ...")
+    await download(url, path)
+    logger.info(f"sending {path} ...")
+    await send_music(bot_token, chat_id, path)
     # remove file after sending
-    logging.info(f"removing: {path}")
+    logger.info(f"removing {path} ...")
     os.remove(path)
     return path
+
+
+def logger(mod_name=__name__):
+    """
+    To use this, do logger = get_module_logger(__name__)
+    """
+    logger1 = logging.getLogger(mod_name)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s [%(name)-12s] %(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    logger1.addHandler(handler)
+    logger1.setLevel(logging.DEBUG)
+    return logger1
+
+
 
 
 if __name__ == '__main__':
     # print_hi('PyCharm')
 
     asyncio.run(check_recently_added_tracks(playlist_uri))
-    # asyncio.run(send_music(bot_token, chat_id, './music.mp3'))
-    # send_audio(bot_token, chat_id, './music.mp3')
+    # asyncio.run(pass_spotify())
