@@ -21,39 +21,38 @@ playlist_uri = 'https://open.spotify.com/playlist/0nixvGXVVYy23KDUD09e4y?si=88d8
 logger = get_module_logger(__name__)
 
 
-async def check_recently_added_tracks(playlist_uri):
+async def check_recently_added_tracks(playlist_uri, interval):
     last_checked_time = datetime.datetime.utcnow() - datetime.timedelta(seconds=interval)
     while True:
-        logger.info("getting playlist items...")
+        logger.info("Getting playlist items...")
+        try:
+            # Retrieve the current state of the playlist
+            results = spotify.playlist_items(playlist_uri)
+            logger.info("Checking playlist for new items...")
 
-        # Retrieve the current state of the playlist
-        results = spotify.playlist_items(playlist_uri)
+            current_time = datetime.datetime.utcnow()
 
-        logger.info(f"checking playlist for new items...")
+            filtered_items = filter(
+                lambda track: datetime.datetime.strptime(track['added_at'], "%Y-%m-%dT%H:%M:%SZ") > last_checked_time,
+                results['items']
+            )
 
-        # Get the current time in UTC
-        current_time = datetime.datetime.utcnow()
+            for track in filtered_items:
+                track_name = track['track']['name']
+                artist_name = track['track']['artists'][0]['name']
+                url = track['track']['external_urls']['spotify']
+                path = f"./{artist_name} - {track_name}.mp3"
 
-        # Extract the track information from the retrieved tracks
-        for track in results['items']:
-            track_name = track['track']['name']
-            added_at = track['added_at']
-            artist_name = track['track']['artists'][0]['name']
-            url = track['track']['external_urls']['spotify']
-            path = f"./{artist_name} - {track_name}.mp3"
-
-            # Convert the added_at timestamp to a datetime object
-            added_time = datetime.datetime.strptime(added_at, "%Y-%m-%dT%H:%M:%SZ")
-
-            # Calculate the time difference between current_time and added_time
-            time_difference = last_checked_time - added_time
-            # Check if the track was added within the last 10 seconds
-            if time_difference.total_seconds() <= interval:
                 logger.info(f"Recently added track: {track_name}")
-                await task(url, path)
+                asyncio.create_task(perform_task(url, path))
 
-        last_checked_time = current_time
-        time.sleep(interval)
+            last_checked_time = current_time
+            await asyncio.sleep(interval)
+
+        except Exception as e:
+            # Handle any exceptions that occur during the execution
+            logger.error(f"An error occurred: {str(e)}")
+            # Decide how to handle the error based on your specific requirements
 
 
 async def download(url, path):
@@ -63,7 +62,7 @@ async def download(url, path):
     return path
 
 
-async def task(url, path):
+async def perform_task(url, path):
     try:
         logger.info(f"Downloading {path}...")
         await download(url, path)
@@ -82,5 +81,7 @@ async def task(url, path):
 
 if __name__ == '__main__':
 
-    asyncio.run(check_recently_added_tracks(playlist_uri))
-    # asyncio.run(pass_spotify())
+    # asyncio.run(check_recently_added_tracks(playlist_uri, interval))
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(check_recently_added_tracks(playlist_uri, interval))
