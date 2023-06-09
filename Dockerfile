@@ -16,8 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copy the Python script and requirements.txt
-COPY main.py telegram_helper.py /app/
-COPY requirements.txt /app/
+COPY . /app/
 
 
 # Install dependencies
