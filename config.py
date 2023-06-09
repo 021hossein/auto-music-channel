@@ -19,3 +19,4 @@ bot_token = os.getenv('BOT_TOKEN', '5927525345:AAFNHk_jxBQXof3UEW2I--3zG71485Dnh
 chat_id = os.getenv('CHAT_ID', '@EclecticEuphoria')
 interval = int(os.getenv('INTERVAL', '15'))
 playlist_uri = os.getenv('PLAYLIST_URI', 'https://open.spotify.com/playlist/0nixvGXVVYy23KDUD09e4y?si=88d8a7433512415a')
+path = './music/'
