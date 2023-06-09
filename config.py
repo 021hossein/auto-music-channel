@@ -1,8 +1,8 @@
 import os
 
 # Get proxy configuration from environment variables
-proxy_host = os.getenv('PROXY_HOST', 'fodev.org')
-proxy_port = os.getenv('PROXY_PORT', '8118')
+proxy_host = os.getenv('PROXY_HOST', None)
+proxy_port = os.getenv('PROXY_PORT', None)
 
 # Set up the proxy for requests library if the configuration is set
 proxies = {}
