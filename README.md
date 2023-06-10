@@ -20,6 +20,7 @@ Before running the bot, you need to set the following environment variables:
 - `BOT_TOKEN`: Telegram bot token obtained from the BotFather.
 - `CHAT_ID`: Telegram channel ID where you want to send the songs.
 - `PLAYLIST_URIS`: Comma-separated list of Spotify playlist URIs
+- `TRACKS_LIMIT`: (optional) The maximum number of tracks to retrieve from each playlist in each check interval. default is 50 tracks.
 - `INTERVAL`: (optional) Sync interval in seconds. Default is 60 seconds.
 - `MAX_CONCURRENT_TASKS`: (optional) Maximum number of concurrent tasks. Default is 5.
 
@@ -47,6 +48,7 @@ CLIENT_SECRET=<your-spotify-client-secret>
 BOT_TOKEN=<your-telegram-bot-token>
 CHAT_ID=<your-telegram-channel-id>
 PLAYLIST_URIS=<your-spotify-playlist-uris>
+TRACKS_LIMIT=<track-limit>
 INTERVAL=<interval-in-seconds>
 MAX_CONCURRENT_TASKS=<max-concurrent-tasks>
 ```
@@ -76,6 +78,7 @@ docker run -d --name telegram-spotify-sync-bot \
   -e BOT_TOKEN=<your-telegram-bot-token> \
   -e CHAT_ID=<your-telegram-channel-id> \
   -e PLAYLIST_URIS=<your-spotify-playlist-uris> \
+  -e TRACKS_LIMIT=<track-limit> \
   -e INTERVAL=<interval-in-seconds> \
   -e MAX_CONCURRENT_TASKS=<max-concurrent-tasks> \
   telegram-spotify-sync-bot

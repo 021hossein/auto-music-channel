@@ -2,13 +2,13 @@ import datetime
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from config import client_id, client_secret, proxies, playlist_uris
+from config import client_id, client_secret, proxies, playlist_uris, tracks_limit
 from logger import get_module_logger
 
 logger = get_module_logger('spotify')
 
 
-def filter_recently_added_tracks(playlist_uri, last_checked_time, limit=100):
+def filter_recently_added_tracks(playlist_uri, last_checked_time, limit=tracks_limit):
     # Set up Spotify client credentials manager
     client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
     spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager, proxies=proxies)

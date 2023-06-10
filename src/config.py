@@ -23,4 +23,5 @@ chat_id = os.getenv('CHAT_ID')
 playlist_uris = os.getenv('PLAYLIST_URIS', '').split(',')
 interval = int(os.getenv('INTERVAL', '60'))
 max_concurrent_tasks = int(os.getenv('MAX_CONCURRENT_TASKS', '5'))
+tracks_limit = int(os.getenv('TRACKS_LIMIT', '50'))
 path = './music/'
