@@ -9,9 +9,9 @@ This is a Telegram bot that automatically syncs a Telegram channel with a Spotif
 - Dockerized for easy deployment and scalability.
 
 ## Prerequisites
-Docker: [Installation Guide](https://docs.docker.com/get-docker/)
-Spotify Developer Account: [Create an App](https://developer.spotify.com/dashboard/applications)
-Telegram Bot Token: [Create a Bot](https://core.telegram.org/bots#botfather)
+- Docker: [Installation Guide](https://docs.docker.com/get-docker/)
+- Spotify Developer Account: [Create an App](https://developer.spotify.com/dashboard/applications)
+- Telegram Bot Token: [Create a Bot](https://core.telegram.org/bots#botfather)
 
 ## Configuration
 Before running the bot, you need to set the following environment variables:
