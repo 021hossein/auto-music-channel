@@ -1,12 +1,11 @@
 # Telegram-Spotify Sync Bot
-This is a Telegram bot that automatically syncs a Telegram channel with a Spotify playlist. It continuously monitors the Spotify playlist for new songs and sends them to the Telegram channel in real-time.
+This is a Telegram bot that automatically syncs a Telegram channel with one or more Spotify playlists. It continuously monitors the Spotify playlist for new songs and sends them to the Telegram channel in real-time.
 
 ## Features
-- Automatically syncs a Spotify playlist with a Telegram channel.
-- Sends new songs added to the Spotify playlist to the Telegram channel.
-- Customizable sync interval to control how frequently the playlist is checked.
-- Limits the number of concurrent tasks to prevent overwhelming the system.
-- Dockerized for easy deployment and scalability.
+- **Real-time Sync**: The bot continuously monitors the specified Spotify playlists for new songs and sends them to the corresponding Telegram channels in real-time.
+- **Multi-Playlist Support**: The bot supports syncing multiple Spotify playlists with their respective Telegram channels.
+- **Customizable Interval**: You can configure the interval at which the bot checks for new songs in the playlists.
+- **Concurrent Processing**: The bot can process multiple songs concurrently, allowing for faster synchronization.
 
 ## Prerequisites
 - Docker: [Installation Guide](https://docs.docker.com/get-docker/)
@@ -19,8 +18,8 @@ Before running the bot, you need to set the following environment variables:
 - `CLIENT_ID`: Spotify client ID from your Spotify developer account.
 - `CLIENT_SECRET`: Spotify client secret from your Spotify developer account.
 - `BOT_TOKEN`: Telegram bot token obtained from the BotFather.
-- `CHAT_ID`: Telegram channel ID where you want to send the synced songs.
-- `PLAYLIST_URI`: Spotify playlist URI that you want to sync.
+- `CHAT_ID`: Telegram channel ID where you want to send the songs.
+- `PLAYLIST_URIS`: Comma-separated list of Spotify playlist URIs
 - `INTERVAL`: (optional) Sync interval in seconds. Default is 60 seconds.
 - `MAX_CONCURRENT_TASKS`: (optional) Maximum number of concurrent tasks. Default is 5.
 
@@ -47,12 +46,12 @@ CLIENT_ID=<your-spotify-client-id>
 CLIENT_SECRET=<your-spotify-client-secret>
 BOT_TOKEN=<your-telegram-bot-token>
 CHAT_ID=<your-telegram-channel-id>
-PLAYLIST_URI=<your-spotify-playlist-uri>
+PLAYLIST_URIS=<your-spotify-playlist-uris>
 INTERVAL=<interval-in-seconds>
 MAX_CONCURRENT_TASKS=<max-concurrent-tasks>
 ```
 
-Make sure to replace `<your-spotify-client-id>`, `<your-spotify-client-secret>`, `<your-telegram-bot-token>`, `<your-telegram-channel-id>`, `<your-spotify-playlist-uri>`, `<interval-in-seconds>`, and `<max-concurrent-tasks>` with your actual values.
+Make sure to replace `<your-spotify-client-id>`, `<your-spotify-client-secret>`, `<your-telegram-bot-token>`, `<your-telegram-channel-id>`, `<your-spotify-playlist-uris>`, `<interval-in-seconds>`, and `<max-concurrent-tasks>` with your actual values.
 
 4. Run the Bot
 You can run the bot using the following command:
@@ -76,7 +75,7 @@ docker run -d --name telegram-spotify-sync-bot \
   -e CLIENT_SECRET=<your-spotify-client-secret> \
   -e BOT_TOKEN=<your-telegram-bot-token> \
   -e CHAT_ID=<your-telegram-channel-id> \
-  -e PLAYLIST_URI=<your-spotify-playlist-uri> \
+  -e PLAYLIST_URIS=<your-spotify-playlist-uris> \
   -e INTERVAL=<interval-in-seconds> \
   -e MAX_CONCURRENT_TASKS=<max-concurrent-tasks> \
   telegram-spotify-sync-bot

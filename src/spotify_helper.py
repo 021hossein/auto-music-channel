@@ -2,7 +2,7 @@ import datetime
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from config import client_id, client_secret, proxies, playlist_uri
+from config import client_id, client_secret, proxies, playlist_uris
 from logger import get_module_logger
 
 logger = get_module_logger('spotify')
@@ -77,7 +77,7 @@ def test():
     last_checked_time = datetime.datetime.utcnow() - datetime.timedelta(days=1)
     limit = 10
 
-    tracks = filter_recently_added_tracks(playlist_uri, last_checked_time, limit)
+    tracks = filter_recently_added_tracks(playlist_uris[0], last_checked_time, limit)
     for track in tracks:
         print(track)
 
