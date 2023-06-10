@@ -16,13 +16,13 @@ Telegram Bot Token: [Create a Bot](https://core.telegram.org/bots#botfather)
 ## Configuration
 Before running the bot, you need to set the following environment variables:
 
-`CLIENT_ID`: Spotify client ID from your Spotify developer account.
-`CLIENT_SECRET`: Spotify client secret from your Spotify developer account.
-`BOT_TOKEN`: Telegram bot token obtained from the BotFather.
-`CHAT_ID`: Telegram channel ID where you want to send the synced songs.
-`PLAYLIST_URI`: Spotify playlist URI that you want to sync.
-`INTERVAL`: (optional) Sync interval in seconds. Default is 60 seconds.
-`MAX_CONCURRENT_TASKS`: (optional) Maximum number of concurrent tasks. Default is 5.
+- `CLIENT_ID`: Spotify client ID from your Spotify developer account.
+- `CLIENT_SECRET`: Spotify client secret from your Spotify developer account.
+- `BOT_TOKEN`: Telegram bot token obtained from the BotFather.
+- `CHAT_ID`: Telegram channel ID where you want to send the synced songs.
+- `PLAYLIST_URI`: Spotify playlist URI that you want to sync.
+- `INTERVAL`: (optional) Sync interval in seconds. Default is 60 seconds.
+- `MAX_CONCURRENT_TASKS`: (optional) Maximum number of concurrent tasks. Default is 5.
 
 
 ## Usage
