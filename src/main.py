@@ -1,7 +1,7 @@
 import asyncio
 import datetime
 
-from config import interval, max_concurrent_tasks
+from config import interval, max_concurrent_tasks, playlist_uri
 from logger import get_module_logger
 from spotify_helper import filter_recently_added_tracks
 from task import perform_task
@@ -71,6 +71,7 @@ def run_bot(playlist_uris, interval, max_concurrent_tasks):
 if __name__ == '__main__':
     # List of playlist URIs
     playlist_uris = [
+        playlist_uri,
         "https://open.spotify.com/playlist/7mydqcdMUFYrvGGtxFYfKr",
         "https://open.spotify.com/playlist/1sS0SlLSMch7MBb2yIYqS7"
     ]
