@@ -39,24 +39,24 @@ cd telegram-spotify-sync-bot
 ```
 pip install -r requirements.txt
 ```
-3. Set Up Configuration
+3. Set Up Configuration:
+
 Create a `.env` file in the root directory of the project and populate it with the following environment variables:
 
 ```
-CLIENT_ID=<your-spotify-client-id>
-CLIENT_SECRET=<your-spotify-client-secret>
-BOT_TOKEN=<your-telegram-bot-token>
-CHAT_ID=<your-telegram-channel-id>
-PLAYLIST_URIS=<your-spotify-playlist-uris>
-TRACKS_LIMIT=<track-limit>
-INTERVAL=<interval-in-seconds>
-MAX_CONCURRENT_TASKS=<max-concurrent-tasks>
+CLIENT_ID=your-spotify-client-id
+CLIENT_SECRET=your-spotify-client-secret
+BOT_TOKEN=your-telegram-bot-token
+CHAT_ID=your-telegram-channel-id
+PLAYLIST_URIS=spotify-playlist-uri1,spotify-playlist-uri2
+TRACKS_LIMIT=100
+INTERVAL=60
+MAX_CONCURRENT_TASKS=5
 ```
 
 Make sure to replace `<your-spotify-client-id>`, `<your-spotify-client-secret>`, `<your-telegram-bot-token>`, `<your-telegram-channel-id>`, `<your-spotify-playlist-uris>`, `<interval-in-seconds>`, and `<max-concurrent-tasks>` with your actual values.
 
 4. Run the Bot
-You can run the bot using the following command:
 ```
 python src/main.py
 ```
@@ -73,17 +73,16 @@ docker build -t telegram-spotify-sync-bot .
 2. Run the Docker Container:
 ```
 docker run -d --name telegram-spotify-sync-bot \
-  -e CLIENT_ID=<your-spotify-client-id> \
-  -e CLIENT_SECRET=<your-spotify-client-secret> \
-  -e BOT_TOKEN=<your-telegram-bot-token> \
-  -e CHAT_ID=<your-telegram-channel-id> \
-  -e PLAYLIST_URIS=<your-spotify-playlist-uris> \
-  -e TRACKS_LIMIT=<track-limit> \
-  -e INTERVAL=<interval-in-seconds> \
-  -e MAX_CONCURRENT_TASKS=<max-concurrent-tasks> \
+  -e CLIENT_ID=your-spotify-client-id \
+  -e CLIENT_SECRET=your-spotify-client-secret \
+  -e BOT_TOKEN=your-telegram-bot-token \
+  -e CHAT_ID=your-telegram-channel-id \
+  -e PLAYLIST_URIS=spotify-playlist-uri1,spotify-playlist-uri2 \
+  -e TRACKS_LIMIT=100 \
+  -e INTERVAL=60 \
+  -e MAX_CONCURRENT_TASKS=5 \
   telegram-spotify-sync-bot
 ```
-Make sure to replace `<your-spotify-client-id>`, `<your-spotify-client-secret>`, `<your-telegram-bot-token>`, `<your-telegram-channel-id>`, `<your-spotify-playlist-uri>`, `<interval-in-seconds>`, and `<max-concurrent-tasks>` with your actual values.
 
 The bot will start running inside the Docker container, syncing the Telegram channel with the Spotify playlist.
 
