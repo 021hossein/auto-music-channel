@@ -13,7 +13,7 @@ def filter_recently_added_tracks(playlist_uri, last_checked_time, limit=100):
     client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
     spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager, proxies=proxies)
 
-    logger.info("Getting playlist items...")
+    logger.info(f"Getting playlist items... {playlist_uri[-4:]}")
 
     # Retrieve the first 100 tracks from the playlist
     results = spotify.playlist_items(playlist_uri, limit=limit)

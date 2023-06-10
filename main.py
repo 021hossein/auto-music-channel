@@ -1,17 +1,17 @@
 import asyncio
 import datetime
-import time
 
-from config import *
-from telegram_helper import send_music
+from config import interval, max_concurrent_tasks
 from logger import get_module_logger
 from spotify_helper import filter_recently_added_tracks
+from task import perform_task
 
-# Define the Spotify playlist URI or URL
-playlist_uri = 'https://open.spotify.com/playlist/0nixvGXVVYy23KDUD09e4y?si=88d8a7433512415a'
 
 # Get the logger for the current module or script
 logger = get_module_logger(__name__)
+
+# Global task queue
+task_queue = asyncio.Queue()
 
 
 async def check_recently_added_tracks(playlist_uri, interval):
@@ -20,47 +20,59 @@ async def check_recently_added_tracks(playlist_uri, interval):
         logger.info("Getting playlist items...")
         try:
             new_tracks = filter_recently_added_tracks(playlist_uri, last_checked_time)
-            current_time = datetime.datetime.utcnow()
+            last_checked_time = datetime.datetime.utcnow()
 
             for track in new_tracks:
                 logger.info(f"Recently added track: {track['track_name']}")
-                asyncio.create_task(perform_task(track['url'], track['file_name']))
+                await task_queue.put(track)  # Enqueue the task
 
-            last_checked_time = current_time
             await asyncio.sleep(interval)
 
         except Exception as e:
-            # Handle any exceptions that occur during the execution
             logger.error(f"An error occurred: {str(e)}")
-            # Decide how to handle the error based on your specific requirements
 
 
-async def download(url, file_name):
-    command = f'spotdl  --output "{path}" {url}'
-    process = await asyncio.create_subprocess_shell(command)
-    await process.communicate()
-    return file_name
+async def process_tasks(max_concurrent_tasks):
+    running_tasks = set()
+    while True:
+        logger.info(f"Pending tasks: {task_queue.qsize()}  Running tasks: {len(running_tasks)}")
+
+        if len(running_tasks) < max_concurrent_tasks and not task_queue.empty():
+            track = await task_queue.get()  # Dequeue the task
+
+            task = asyncio.create_task(perform_task(track))
+            running_tasks.add(task)
+            task.add_done_callback(lambda t: running_tasks.remove(t))
+
+        await asyncio.sleep(1)  # Allow other tasks to run
 
 
-async def perform_task(url, file_name):
+def run_bot(playlist_uris, interval, max_concurrent_tasks):
+    loop = asyncio.get_event_loop()
+
     try:
-        logger.info(f"Downloading {file_name}...")
-        await download(url, file_name)
-        logger.info(f"Sending {file_name}...")
-        await send_music(bot_token, chat_id, f'{path}{file_name}')
-        # Remove file after sending
-        logger.info(f"Removing {file_name}...")
-        os.remove(f'{path}{file_name}')
-        return file_name
-    except Exception as e:
-        # Handle any exceptions that occur during the execution
-        # Log the error or perform any necessary error handling
-        print(f"An error occurred in task: {str(e)}")
-        return None
+        # Start the task processing coroutine
+        loop.create_task(process_tasks(max_concurrent_tasks))
+
+        # Start the check_recently_added_tracks() coroutine for each playlist
+        for playlist_uri in playlist_uris:
+            loop.create_task(check_recently_added_tracks(playlist_uri, interval))
+
+        loop.run_forever()
+    except KeyboardInterrupt:
+        # Handle keyboard interrupt (Ctrl+C) to gracefully stop the execution
+        pass
+    finally:
+        # Clean up resources
+        loop.stop()
+        loop.close()
 
 
 if __name__ == '__main__':
-    # asyncio.run(check_recently_added_tracks(playlist_uri, interval))
+    # List of playlist URIs
+    playlist_uris = [
+        "https://open.spotify.com/playlist/7mydqcdMUFYrvGGtxFYfKr",
+        "https://open.spotify.com/playlist/1sS0SlLSMch7MBb2yIYqS7"
+    ]
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(check_recently_added_tracks(playlist_uri, interval))
+    run_bot(playlist_uris, interval, max_concurrent_tasks)
