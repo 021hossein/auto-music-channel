@@ -3,7 +3,7 @@ import datetime
 
 from config import interval, max_concurrent_tasks, playlist_uris, logging_interval
 from logger import get_module_logger
-from spotify_helper import filter_recently_added_tracks
+from spotify_helper import get_recently_added_tracks
 from task import perform_task
 
 # Get the logger for the current module or script
@@ -19,7 +19,7 @@ async def check_recently_added_tracks(playlist_uri, interval):
     while True:
         logger.info("Getting playlist items...")
         try:
-            new_songs = filter_recently_added_tracks(playlist_uri, last_checked_time)
+            new_songs = await get_recently_added_tracks(playlist_uri, last_checked_time)
             last_checked_time = datetime.datetime.utcnow()
 
             for song in new_songs:

@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import spotipy
 from spotdl import Song
@@ -6,18 +7,24 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from config import client_id, client_secret, proxies, playlist_uris, tracks_limit
 from logger import get_module_logger
 
+client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
+spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager, proxies=proxies)
+
 logger = get_module_logger('spotify')
 
 
-def filter_recently_added_tracks(playlist_uri, last_checked_time, limit=tracks_limit):
-    # Set up Spotify client credentials manager
-    client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
-    spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager, proxies=proxies)
+async def async_playlist_item(playlist_uri, limit=tracks_limit, offset=0):
+    return await asyncio.to_thread(
+        spotify.playlist_items,
+        playlist_id=playlist_uri,
+        limit=limit,
+        offset=offset
+    )
 
-    logger.info(f"Getting playlist items... {playlist_uri[-4:]}")
 
+async def get_latest_playlist_item(playlist_uri, limit):
     # Retrieve the first 100 tracks from the playlist
-    results = spotify.playlist_items(playlist_uri, limit=limit)
+    results = await async_playlist_item(playlist_uri, limit=limit)
 
     total_tracks = results['total']
     if total_tracks > limit:
@@ -26,9 +33,16 @@ def filter_recently_added_tracks(playlist_uri, last_checked_time, limit=tracks_l
         logger.info(f"Getting the last {limit} items from the playlist...")
 
         # Retrieve the last 100 tracks from the playlist
-        results = spotify.playlist_items(playlist_uri, offset=offset)
+        results = await async_playlist_item(playlist_uri, offset=offset)
 
-    logger.info("Checking playlist for new items...")
+    return results
+
+
+async def get_recently_added_tracks(playlist_uri, last_checked_time, limit=tracks_limit):
+
+    logger.info(f"Getting playlist items... {playlist_uri[-4:]}")
+
+    results = await get_latest_playlist_item(playlist_uri, limit=limit)
 
     filtered_items = [
         track for track in results['items']
@@ -74,10 +88,12 @@ def filter_recently_added_tracks(playlist_uri, last_checked_time, limit=tracks_l
 
 
 if __name__ == '__main__':
-    last_checked_time = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-    limit = 10
+    tracks = get_recently_added_tracks(
+        playlist_uri=playlist_uris[0],
+        last_checked_time=datetime.datetime.utcnow() - datetime.timedelta(days=1),
+        limit=10
+    )
 
-    tracks = filter_recently_added_tracks(playlist_uris[0], last_checked_time, limit)
     for track in tracks:
         print(track)
 
