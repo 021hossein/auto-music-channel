@@ -1,17 +1,17 @@
 import asyncio
 import datetime
 
-from config import interval, max_concurrent_tasks, playlist_uris
+from config import interval, max_concurrent_tasks, playlist_uris, logging_interval
 from logger import get_module_logger
 from spotify_helper import filter_recently_added_tracks
 from task import perform_task
-
 
 # Get the logger for the current module or script
 logger = get_module_logger(__name__)
 
 # Global task queue
 task_queue = asyncio.Queue()
+running_tasks = set()
 
 
 async def check_recently_added_tracks(playlist_uri, interval):
@@ -19,12 +19,12 @@ async def check_recently_added_tracks(playlist_uri, interval):
     while True:
         logger.info("Getting playlist items...")
         try:
-            new_tracks = filter_recently_added_tracks(playlist_uri, last_checked_time)
+            new_songs = filter_recently_added_tracks(playlist_uri, last_checked_time)
             last_checked_time = datetime.datetime.utcnow()
 
-            for track in new_tracks:
-                logger.info(f"Recently added track: {track['track_name']}")
-                await task_queue.put(track)  # Enqueue the task
+            for song in new_songs:
+                logger.info(f"Recently added track: {song.display_name}")
+                await task_queue.put(song)  # Enqueue the task
 
             await asyncio.sleep(interval)
 
@@ -33,24 +33,34 @@ async def check_recently_added_tracks(playlist_uri, interval):
 
 
 async def process_tasks(max_concurrent_tasks):
-    running_tasks = set()
     while True:
-        logger.info(f"Pending tasks: {task_queue.qsize()}  Running tasks: {len(running_tasks)}")
-
         if len(running_tasks) < max_concurrent_tasks and not task_queue.empty():
-            track = await task_queue.get()  # Dequeue the task
+            song = await task_queue.get()  # Dequeue the task
 
-            task = asyncio.create_task(perform_task(track))
+            task = asyncio.create_task(perform_task(song))
             running_tasks.add(task)
             task.add_done_callback(lambda t: running_tasks.remove(t))
 
-        await asyncio.sleep(1)  # Allow other tasks to run
+        await asyncio.sleep(0)  # Allow other tasks to run
+
+
+async def logging_pending_count(checking_interval=logging_interval):
+    while checking_interval > 0:
+        pending_task_size = task_queue.qsize()
+        if pending_task_size == 0:
+            logger.info(f"Running tasks: {len(running_tasks)}")
+        else:
+            logger.info(f"Pending tasks: {task_queue.qsize()}")
+
+        await asyncio.sleep(checking_interval)  # Allow other tasks to run
 
 
 def run_bot(playlist_uris, interval, max_concurrent_tasks):
     loop = asyncio.get_event_loop()
 
     try:
+        loop.create_task(logging_pending_count())
+
         # Start the task processing coroutine
         loop.create_task(process_tasks(max_concurrent_tasks))
 

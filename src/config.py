@@ -24,4 +24,8 @@ playlist_uris = os.getenv('PLAYLIST_URIS', '').split(',')
 interval = int(os.getenv('INTERVAL', '60'))
 max_concurrent_tasks = int(os.getenv('MAX_CONCURRENT_TASKS', '5'))
 tracks_limit = int(os.getenv('TRACKS_LIMIT', '50'))
-path = './music/'
+download_path = './download/{artist}/{album}/{track-number} - {title}'
+
+# logging_pending_counter_interval, set 0 for disabling
+logging_interval = int(os.getenv('LOGGING_INTERVAL', '5'))
+

@@ -1,5 +1,6 @@
 import datetime
 import spotipy
+from spotdl import Song
 from spotipy.oauth2 import SpotifyClientCredentials
 
 from config import client_id, client_secret, proxies, playlist_uris, tracks_limit
@@ -36,44 +37,43 @@ def filter_recently_added_tracks(playlist_uri, last_checked_time, limit=tracks_l
 
     new_tracks = []
 
-    for track in filtered_items:
-        track_name = track['track']['name']
-        artist_name = track['track']['artists'][0]['name']
-        url = track['track']['external_urls']['spotify']
-        file_name = f"{artist_name} - {track_name}.mp3".replace('"', "'")
+    for item in filtered_items:
+        track = item['track']
+        song = Song(
+            name=track["name"],
+            artists=[artist["name"] for artist in track["artists"]],
+            artist=track["artists"][0]["name"],
+            album_id=track['album']["id"],
+            album_name=track['album']["name"],
+            album_artist=track['album']["artists"][0]["name"],
+            copyright_text=None,
+            genres=track.get('genres') or [],
+            disc_number=track["disc_number"],
+            disc_count=int(track["disc_number"]),
+            duration=track["duration_ms"] / 1000,
+            year=int(track['album']["release_date"][:4]),
+            date=track['album']["release_date"],
+            track_number=track["track_number"],
+            tracks_count=track['album']["total_tracks"],
+            isrc=track.get("external_ids", {}).get("isrc"),
+            song_id=track["id"],
+            explicit=track["explicit"],
+            publisher=track['album'].get('label') or '',
+            url=track["external_urls"]["spotify"],
+            popularity=track["popularity"],
+            cover_url=max(
+                track['album']["images"], key=lambda i: i["width"] * i["height"]
+            )["url"]
+            if track['album']["images"]
+            else None,
+        )
 
-        album_name = track['track']['album']['name']
-        duration_ms = track['track']['duration_ms']
-        popularity = track['track']['popularity']
-        release_date = track['track']['album']['release_date']
-        track_id = track['track']['id']
-        preview_url = track['track']['preview_url']
-        external_ids = track['track']['external_ids']
-        additional_artists = [artist['name'] for artist in track['track']['artists'][1:]]
-        cover_url = track['track']['album']['images'][0]['url']
-
-        t = {
-            'track_name': track_name,
-            'artist_name': artist_name,
-            'url': url,
-            'file_name': file_name,
-            'album_name': album_name,
-            'duration_ms': duration_ms,
-            'popularity': popularity,
-            'release_date': release_date,
-            'track_id': track_id,
-            'preview_url': preview_url,
-            'external_ids': external_ids,
-            'additional_artists': additional_artists,
-            'cover_url': cover_url,
-        }
-
-        new_tracks.append(t)
+        new_tracks.append(song)
 
     return new_tracks
 
 
-def test():
+if __name__ == '__main__':
     last_checked_time = datetime.datetime.utcnow() - datetime.timedelta(days=1)
     limit = 10
 

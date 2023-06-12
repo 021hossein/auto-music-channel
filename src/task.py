@@ -1,37 +1,25 @@
-import asyncio
+from spotdl import Song
 
 from config import *
+from src.downloader import Downloader
 from telegram_helper import send_music
 from logger import get_module_logger
 
 
 # Get the logger for the current module or script
 logger = get_module_logger(__name__)
+downloader = Downloader(settings={'output': download_path})
 
 
-async def download(url, file_name):
-    command = f'spotdl  --output "{path}" {url}'
-    process = await asyncio.create_subprocess_shell(command)
-    await process.communicate()
-    return file_name
-
-
-async def perform_task(track):
+async def perform_task(song: Song):
     try:
-        file_name = track['file_name']
-        url = track['url']
-        file_path = f'{path}{file_name}'
+        logger.info(f"Downloading {song.display_name}...")
+        song, path = await downloader.search_and_download(song)
 
-        logger.info(f"Downloading {file_name}...")
-        await download(url, file_name)
+        logger.info(f"Sending {path}...")
+        await send_music(bot_token, chat_id, path)
 
-        logger.info(f"Sending {file_name}...")
-        await send_music(bot_token, chat_id, file_path)
-
-        logger.info(f"Removing {file_name}...")
-        os.remove(f'{path}{file_name}')
-
-        return file_name
+        return song.display_name
     except Exception as e:
         # Handle any exceptions that occur during the execution
         # Log the error or perform any necessary error handling
