@@ -21,7 +21,7 @@ async def check_recently_added_tracks(playlist_uri, interval):
             new_items = await get_recently_added_tracks(playlist_uri, last_added_at_time)
 
             for item in new_items:
-                logger.info(f"Recently added track: {item.song.display_name}")
+                logger.info(f"Recently added track: {item.offset} - {item.song.title}")
                 last_added_at_time = item.added_at
                 await task_queue.put(item.song)  # Enqueue the task
 

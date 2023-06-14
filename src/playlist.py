@@ -12,25 +12,28 @@ spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager,
 
 
 class PlayListItem:
-    def __init__(self, song, added_at):
+    def __init__(self, song, added_at, offset, total):
         self.song = song
         self.added_at = added_at
+        self.offset = offset
+        self.total = total
 
 
-async def async_playlist_item(playlist_uri, limit=tracks_limit, offset=0):
+async def async_playlist_item(playlist_uri, limit=tracks_limit, offset=0) -> list[PlayListItem]:
     response = await asyncio.to_thread(
         spotify.playlist_items,
         playlist_id=playlist_uri,
         limit=limit,
         offset=offset
     )
-    return response['total'], get_playlist_items(response)
+    return get_playlist_items(response)
 
 
-def get_playlist_items(results):
+def get_playlist_items(results) -> list[PlayListItem]:
+    offset = results['offset']
     playlist_items = []
-
     for item in results['items']:
+        offset += 1
         track = item['track']
         added_at = datetime.datetime.strptime(item['added_at'], "%Y-%m-%dT%H:%M:%SZ")
         song = Song(
@@ -62,7 +65,14 @@ def get_playlist_items(results):
             else None,
         )
 
-        playlist_items.append(PlayListItem(song, added_at))
+        playlist_items.append(
+            PlayListItem(
+                song=song,
+                added_at=added_at,
+                offset=offset,
+                total=results['total']
+            )
+        )
 
     return playlist_items
 

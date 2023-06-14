@@ -9,7 +9,8 @@ logger = get_module_logger('spotify')
 
 async def get_latest_playlist_items(playlist_uri, limit) -> list[PlayListItem]:
     # Retrieve the first 100 tracks from the playlist
-    total_tracks, items = await async_playlist_item(playlist_uri, limit=limit)
+    items = await async_playlist_item(playlist_uri, limit=limit)
+    total_tracks = items[0].total
 
     if total_tracks > limit:
         offset = max(0, total_tracks - limit)
@@ -17,7 +18,7 @@ async def get_latest_playlist_items(playlist_uri, limit) -> list[PlayListItem]:
         logger.info(f"Getting the last {limit} items from the playlist...")
 
         # Retrieve the last 100 tracks from the playlist
-        total_tracks, items = await async_playlist_item(playlist_uri, offset=offset)
+        items = await async_playlist_item(playlist_uri, offset=offset)
 
     return items
 
