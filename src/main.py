@@ -15,16 +15,15 @@ running_tasks = set()
 
 
 async def check_recently_added_tracks(playlist_uri, interval):
-    last_checked_time = datetime.datetime.utcnow() - datetime.timedelta(seconds=interval)
+    last_added_at_time = datetime.datetime.utcnow() - datetime.timedelta(seconds=interval)
     while True:
-        logger.info("Getting playlist items...")
         try:
-            new_songs = await get_recently_added_tracks(playlist_uri, last_checked_time)
-            last_checked_time = datetime.datetime.utcnow()
+            new_items = await get_recently_added_tracks(playlist_uri, last_added_at_time)
 
-            for song in new_songs:
-                logger.info(f"Recently added track: {song.display_name}")
-                await task_queue.put(song)  # Enqueue the task
+            for item in new_items:
+                logger.info(f"Recently added track: {item.song.display_name}")
+                last_added_at_time = item.added_at
+                await task_queue.put(item.song)  # Enqueue the task
 
             await asyncio.sleep(interval)
 
