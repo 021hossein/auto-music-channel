@@ -1,7 +1,7 @@
 import asyncio
 import datetime
 
-from config import interval, max_concurrent_tasks, playlist_uris, logging_interval
+from config import INTERVAL, MAX_CONCURRENT_TASKS, PLAYLIST_URIS, LOGGING_INTERVAL
 from logger import get_module_logger
 from spotify_helper import get_recently_added_tracks
 from task import perform_task
@@ -28,7 +28,7 @@ async def check_recently_added_tracks(playlist_uri, interval):
             await asyncio.sleep(interval)
 
         except Exception as e:
-            logger.error(f"An error occurred: {str(e)}")
+            logger.error(f"An error occurred in check_recently_added_tracks: {str(e)}")
 
 
 async def process_tasks(max_concurrent_tasks):
@@ -43,13 +43,13 @@ async def process_tasks(max_concurrent_tasks):
         await asyncio.sleep(0)  # Allow other tasks to run
 
 
-async def logging_pending_count(checking_interval=logging_interval):
+async def log_pending_task_count(checking_interval=LOGGING_INTERVAL):
     while checking_interval > 0:
         pending_task_size = task_queue.qsize()
         if pending_task_size == 0:
             logger.info(f"Running tasks: {len(running_tasks)}")
         else:
-            logger.info(f"Pending tasks: {task_queue.qsize()}")
+            logger.info(f"Pending tasks: {pending_task_size}")
 
         await asyncio.sleep(checking_interval)  # Allow other tasks to run
 
@@ -58,7 +58,7 @@ def run_bot(playlist_uris, interval, max_concurrent_tasks):
     loop = asyncio.get_event_loop()
 
     try:
-        loop.create_task(logging_pending_count())
+        loop.create_task(log_pending_task_count())
 
         # Start the task processing coroutine
         loop.create_task(process_tasks(max_concurrent_tasks))
@@ -78,4 +78,4 @@ def run_bot(playlist_uris, interval, max_concurrent_tasks):
 
 
 if __name__ == '__main__':
-    run_bot(playlist_uris, interval, max_concurrent_tasks)
+    run_bot(PLAYLIST_URIS, INTERVAL, MAX_CONCURRENT_TASKS)

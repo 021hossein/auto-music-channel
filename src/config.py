@@ -4,28 +4,30 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get proxy configuration from environment variables
-proxy_host = os.getenv('PROXY_HOST', None)
-proxy_port = os.getenv('PROXY_PORT', None)
+PROXY_HOST = os.getenv('PROXY_HOST', None)
+PROXY_PORT = os.getenv('PROXY_PORT', None)
 
-# Set up the proxy for requests library if the configuration is set
-proxies = {}
-if proxy_host and proxy_port:
-    proxies = {
-        'http': f'http://{proxy_host}:{proxy_port}',
-        'https': f'http://{proxy_host}:{proxy_port}',
+# Set up the proxy just for the spotify requests if the configuration is set
+PROXIES = {}
+if PROXY_HOST and PROXY_PORT:
+    PROXIES = {
+        'http': f'http://{PROXY_HOST}:{PROXY_PORT}',
+        'https': f'http://{PROXY_HOST}:{PROXY_PORT}',
     }
 
 # Set default values for other variables
-client_id = os.getenv('CLIENT_ID')
-client_secret = os.getenv('CLIENT_SECRET')
-bot_token = os.getenv('BOT_TOKEN')
-chat_id = os.getenv('CHAT_ID')
-playlist_uris = os.getenv('PLAYLIST_URIS', '').split(',')
-interval = int(os.getenv('INTERVAL', '60'))
-max_concurrent_tasks = int(os.getenv('MAX_CONCURRENT_TASKS', '5'))
-tracks_limit = int(os.getenv('TRACKS_LIMIT', '50'))
-download_path = './download/{artist}/{album}/{track-number} - {title}'
+CLIENT_ID = os.getenv('CLIENT_ID')
+DEBUG = bool(int(os.getenv('DEBUG', '0')))
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+CHAT_ID = os.getenv('CHAT_ID')
+PLAYLIST_URIS = os.getenv('PLAYLIST_URIS', '').split(',')
+INTERVAL = int(os.getenv('INTERVAL', '60'))
+MAX_CONCURRENT_TASKS = int(os.getenv('MAX_CONCURRENT_TASKS', '5'))
+TRACKS_LIMIT = int(os.getenv('TRACKS_LIMIT', '50'))
+DOWNLOAD_PATH = './download/{artist}/{album}/{track-number} - {title}'
 
-# logging_pending_counter_interval, set 0 for disabling
-logging_interval = int(os.getenv('LOGGING_INTERVAL', '5'))
+# LOGGING_INTERVAL, set 0 for disabling
+LOGGING_INTERVAL = int(os.getenv('LOGGING_INTERVAL', '5'))
+
 

@@ -1,6 +1,6 @@
 import datetime
 
-from config import playlist_uris, tracks_limit
+from config import PLAYLIST_URIS, TRACKS_LIMIT
 from logger import get_module_logger
 from src.playlist import async_playlist_item, PlayListItem
 
@@ -23,7 +23,7 @@ async def get_latest_playlist_items(playlist_uri, limit) -> list[PlayListItem]:
     return items
 
 
-async def get_recently_added_tracks(playlist_uri, last_checked_time, limit=tracks_limit):
+async def get_recently_added_tracks(playlist_uri, last_checked_time, limit=TRACKS_LIMIT):
 
     logger.info(f"Getting playlist items... {playlist_uri[-4:]}")
 
@@ -38,7 +38,7 @@ async def get_recently_added_tracks(playlist_uri, last_checked_time, limit=track
 
 if __name__ == '__main__':
     tracks = get_recently_added_tracks(
-        playlist_uri=playlist_uris[0],
+        playlist_uri=PLAYLIST_URIS[0],
         last_checked_time=datetime.datetime.utcnow() - datetime.timedelta(days=1),
         limit=10
     )

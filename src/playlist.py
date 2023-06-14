@@ -5,10 +5,10 @@ import spotipy
 from spotdl import Song
 from spotipy import SpotifyClientCredentials
 
-from src.config import client_id, client_secret, proxies, tracks_limit
+from src.config import CLIENT_ID, CLIENT_SECRET, PROXIES, TRACKS_LIMIT
 
-client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
-spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager, proxies=proxies)
+client_credentials_manager = SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager, proxies=PROXIES)
 
 
 class PlayListItem:
@@ -19,7 +19,7 @@ class PlayListItem:
         self.total = total
 
 
-async def async_playlist_item(playlist_uri, limit=tracks_limit, offset=0) -> list[PlayListItem]:
+async def async_playlist_item(playlist_uri, limit=TRACKS_LIMIT, offset=0) -> list[PlayListItem]:
     response = await asyncio.to_thread(
         spotify.playlist_items,
         playlist_id=playlist_uri,
