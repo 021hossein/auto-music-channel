@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 
 from config import PLAYLIST_URIS, TRACKS_LIMIT
@@ -7,27 +8,30 @@ from src.playlist import async_playlist_item, PlayListItem
 logger = get_module_logger('spotify')
 
 
-async def get_latest_playlist_items(playlist_uri, limit) -> list[PlayListItem]:
-    # Retrieve the first 100 tracks from the playlist
-    items = await async_playlist_item(playlist_uri, limit=limit)
+async def get_latest_playlist_items(playlist_uri, offset, limit) -> list[PlayListItem]:
+    limit = max(10, limit)
+
+    page_size = limit * 2
+    offset = max(0, offset - limit)
+
+    items = await async_playlist_item(playlist_uri, page_size=page_size, offset=offset)
     total_tracks = items[0].total
 
-    if total_tracks > limit:
-        offset = max(0, total_tracks - limit)
+    if offset == 0 and total_tracks > page_size:
+        offset = max(0, total_tracks - page_size)
 
-        logger.info(f"Getting the last {limit} items from the playlist...")
+        logger.info(f"Getting the last {page_size} items from the playlist...")
 
-        # Retrieve the last 100 tracks from the playlist
-        items = await async_playlist_item(playlist_uri, offset=offset)
+        items = await async_playlist_item(playlist_uri, page_size=page_size, offset=offset)
 
     return items
 
 
-async def get_recently_added_tracks(playlist_uri, last_checked_time, limit=TRACKS_LIMIT):
+async def get_recently_added_tracks(playlist_uri, last_checked_time, offset=0, limit=TRACKS_LIMIT):
 
     logger.info(f"Getting playlist items... {playlist_uri[-4:]}")
 
-    items: list[PlayListItem] = await get_latest_playlist_items(playlist_uri, limit=limit)
+    items: list[PlayListItem] = await get_latest_playlist_items(playlist_uri=playlist_uri, offset=offset, limit=limit)
 
     filtered_items = [
         item for item in items
@@ -36,13 +40,14 @@ async def get_recently_added_tracks(playlist_uri, last_checked_time, limit=TRACK
     return filtered_items
 
 
-if __name__ == '__main__':
-    tracks = get_recently_added_tracks(
+async def test():
+    tracks = await get_recently_added_tracks(
         playlist_uri=PLAYLIST_URIS[0],
         last_checked_time=datetime.datetime.utcnow() - datetime.timedelta(days=1),
         limit=10
     )
 
-    for track in tracks:
-        print(track)
+    print(len(tracks))
+if __name__ == '__main__':
+    asyncio.run(test())
 

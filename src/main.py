@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import itertools
 
 from config import INTERVAL, MAX_CONCURRENT_TASKS, PLAYLIST_URIS, LOGGING_INTERVAL
 from logger import get_module_logger
@@ -14,15 +15,19 @@ task_queue = asyncio.Queue()
 running_tasks = set()
 
 
-async def check_recently_added_tracks(playlist_uri, interval):
+async def check_recently_added_tracks(playlist_uri, interval, limit=5):
     last_added_at_time = datetime.datetime.utcnow() - datetime.timedelta(seconds=interval)
+    last_offset = 0  # caching last offset for skipping unnecessary first request to Spotify
+    # todo: can't skip that if new_items is empty
     while True:
         try:
-            new_items = await get_recently_added_tracks(playlist_uri, last_added_at_time)
+            new_items = await get_recently_added_tracks(playlist_uri, last_added_at_time, offset=last_offset)
 
-            for item in new_items:
-                logger.info(f"Recently added track: {item.offset} - {item.song.title}")
+            # limit: The maximum number of recently added tracks to process per iteration.
+            for item in itertools.islice(new_items, limit):
+                logger.info(f"Recently added track: {item.offset} - {item.song.name}")
                 last_added_at_time = item.added_at
+                last_offset = item.offset
                 await task_queue.put(item.song)  # Enqueue the task
 
             await asyncio.sleep(interval)

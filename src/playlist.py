@@ -19,11 +19,11 @@ class PlayListItem:
         self.total = total
 
 
-async def async_playlist_item(playlist_uri, limit=TRACKS_LIMIT, offset=0) -> list[PlayListItem]:
+async def async_playlist_item(playlist_uri, page_size, offset=0) -> list[PlayListItem]:
     response = await asyncio.to_thread(
         spotify.playlist_items,
         playlist_id=playlist_uri,
-        limit=limit,
+        limit=page_size,
         offset=offset
     )
     return get_playlist_items(response)
