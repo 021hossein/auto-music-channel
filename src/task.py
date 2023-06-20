@@ -5,7 +5,6 @@ from src.downloader import Downloader
 from telegram_helper import send_music, send_post
 from logger import get_module_logger
 
-
 # Get the logger for the current module or script
 logger = get_module_logger(__name__)
 downloader = Downloader(settings={'output': DOWNLOAD_PATH})
@@ -21,7 +20,11 @@ async def perform_task(song: Song):
         song, path = await downloader.search_and_download(song)
 
         logger.info(f"Sending {path}...")
-        await send_music(BOT_TOKEN, CHAT_ID, path)
+        await send_music(BOT_TOKEN, chat_id=CHAT_ID, audio_path=path, caption=generate_song_caption(song))
+
+        if REMOVE_FILE:
+            logger.info(f"Removing {path}...")
+            os.remove(path)
 
         return song.display_name
     except Exception as e:
@@ -40,4 +43,10 @@ async def perform_debug_task(song: Song):
     except Exception as e:
         print(f"An error occurred in sending post: {str(e)}")
         return None
-    return song.display_name
+
+
+def generate_song_caption(song: Song):
+    if song is None or CAPTION is False:
+        return None
+    # return f'{song.name}\nby {song.artist}\n\nLyrics:\n\n{song.lyrics}'
+    return CHAT_ID

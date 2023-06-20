@@ -26,6 +26,8 @@ INTERVAL = int(os.getenv('INTERVAL', '60'))
 MAX_CONCURRENT_TASKS = int(os.getenv('MAX_CONCURRENT_TASKS', '5'))
 TRACKS_LIMIT = int(os.getenv('TRACKS_LIMIT', '50'))
 DOWNLOAD_PATH = './download/{artist}/{album}/{track-number} - {title}'
+CAPTION = bool(int(os.getenv('CAPTION', '0')))
+REMOVE_FILE = bool(int(os.getenv('CAPTION', '1')))
 
 # LOGGING_INTERVAL, set 0 for disabling
 LOGGING_INTERVAL = int(os.getenv('LOGGING_INTERVAL', '5'))
